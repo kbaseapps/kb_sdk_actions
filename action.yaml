@@ -1,4 +1,4 @@
-name: Run KBase SDK Tests
+name: KBase SDK Tests
 
 on:
   push:
