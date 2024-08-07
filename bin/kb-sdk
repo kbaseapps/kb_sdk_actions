@@ -1,8 +1,17 @@
 #!/bin/sh
 
+KB_SDK_IMAGE="ghcr.io/kbase/kb_sdk_patch-develop:br-0.0.4"
+
 # Cache the group for the docker file
 if [ ! -e $HOME/.kbsdk.cache ] ; then
-  docker run -i -v /var/run/docker.sock:/var/run/docker.sock --entrypoint ls kbase/kb-sdk -l /var/run/docker.sock|awk '{print $4}' > $HOME/.kbsdk.cache
+  docker run -i -v /var/run/docker.sock:/var/run/docker.sock \
+    --entrypoint ls $KB_SDK_IMAGE  -l /var/run/docker.sock | \
+    awk '{print $4}' > $HOME/.kbsdk.cache
 fi
 
-exec docker run -i --rm -v $HOME:$HOME -u $(id -u) -w $(pwd) -v /var/run/docker.sock:/var/run/docker.sock  -e DUSER=$USER -e DSHELL=$SHELL --group-add $(cat $HOME/.kbsdk.cache) kbase/kb-sdk $@
+exec docker run -i --rm \
+    -v $HOME:$HOME -u $(id -u) -w $(pwd) \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -e DUSER=$USER -e DSHELL=$SHELL \
+    --group-add $(cat $HOME/.kbsdk.cache) \
+    $KB_SDK_IMAGE $@
